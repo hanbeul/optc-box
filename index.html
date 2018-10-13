@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css">
+    <meta charset="utf-8">
+    <title>Hello OpenCV.js</title>
+  </head>
+  <body class="container">
+
+    <div class="box columns">
+      <div class="column">
+        <h1>Hello OpenCV.js</h1></br>
+        <p id="status">OpenCV.js is loading...</p>
+      </div>
+    </div>
+
+    <div class="box columns">
+      <div class="inputoutput column">
+        <label class="file-label">Upload Image</label>
+        <input class="" type="file" id="fileInput" name="file" /><br>
+        <img id="imageSrc" alt="" />
+      </div>
+      <div class="inputoutput column">
+        <label class="file-label">Upload Template</label>
+        <input class="" type="file" id="templateInput" name="template" /><br>
+        <img id="templateSrc" alt="">
+      </div>
+      <div class="column">
+        <h3>Result</h3>
+        <canvas id="canvasOutput" ></canvas>
+      </div>
+    </div>
+
+    <div class="box columns">
+      <div class=column>
+        <h3>Border Detection</h3>
+        <canvas id="borderDetect"></canvas>
+      </div>
+    </div>
+
+
+    <script type="text/javascript" src="script.js"></script>
+    <script async src="opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+  </body>
+</html>
