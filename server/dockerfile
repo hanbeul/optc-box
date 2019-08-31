@@ -1,0 +1,8 @@
+FROM python
+ENV FLASK_APP=server.py
+WORKDIR /app
+RUN pip install --upgrade pip
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+ENTRYPOINT ["python", "main.py"]
