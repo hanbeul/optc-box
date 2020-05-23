@@ -3,27 +3,27 @@ const fs = require('fs');
 const https = require('https');
 
 (async () => {
-  const browser = await puppeteer.launch({headless: false});
-  const page = await browser.newPage();
-  await page.setViewport({width: 1200, height: 800});
-  await page.goto('http://optc-db.github.io/characters/', {waitUntil: "networkidle0"});
-
-  var has_next_page = true;
-  var units = [];
-  var index = 1;
-
-  const saveImage = (url, filepath) => {
-    console.log('Getting image from: ' + url);
-    let request = https.get(url, response => {
-      let file = fs.createWriteStream(filepath);
-      response.pipe(file);
-    }).on('error', e => {
-      console.error('Count not find image at: ' + url);
-    });
-  }
-
-  await page.select('select[name="mainTable_length"]', '100');
   try {
+    const browser = await puppeteer.launch({headless: false});
+    const page = await browser.newPage();
+    await page.setViewport({width: 1200, height: 800});
+    await page.goto('http://optc-db.github.io/characters/', {waitUntil: "networkidle0"});
+
+    var has_next_page = true;
+    var units = [];
+    var index = 1;
+
+    const saveImage = (url, filepath) => {
+      console.log('Getting image from: ' + url);
+      let request = https.get(url, response => {
+        let file = fs.createWriteStream(filepath);
+        response.pipe(file);
+      }).on('error', e => {
+        throw e;
+      });
+    }
+
+    await page.select('select[name="mainTable_length"]', '100');
     while(has_next_page) {
 
       var new_units = await page.evaluate(unit_names => {
@@ -45,35 +45,38 @@ const https = require('https');
         return !document.querySelector('#mainTable_paginate .next').classList.contains('disabled');
       });
 
+      // Wait 1 second
+      //await page.waitFor(500);
+
       if (has_next_page) {
         await page.click('#mainTable_paginate ul li:last-child a', {waitUntil: "networkidle0"});
         //await page.waitFor(500);
       }
 
     }
+
+    await browser.close();
+
+    console.log(units);
+
+    units.forEach(unit => {
+      let path = 'images/' + unit.id + '/';
+      fs.mkdir(path, { recursive: true }, (err) => {
+        if (err) throw err;
+      })
+      saveImage(unit.imgUrl, path + unit.id + '.png');
+    });
+
+    console.log(units);
+
+    fs.writeFile('units.json', JSON.stringify(units), (err) => {
+      if (err) throw err;
+      console.log('File saved');
+    });
   }
   catch (err) {
     throw err;
   }
-
-  console.log(units);
-
-  units.forEach(unit => {
-    let path = 'images/' + unit.id + '/';
-    fs.mkdir(path, { recursive: true }, (err) => {
-      if (err) throw err;
-    })
-    saveImage(unit.imgUrl, path + unit.id + '.png');
-  });
-
-  console.log(units);
-
-  fs.writeFile('units.json', JSON.stringify(units), (err) => {
-    if (err) throw err;
-    console.log('File saved');
-  });
-
-  await browser.close();
 })();
 
 
