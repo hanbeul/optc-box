@@ -23,33 +23,37 @@ const https = require('https');
   }
 
   await page.select('select[name="mainTable_length"]', '100');
+  try {
+    while(has_next_page) {
 
-  while(has_next_page) {
+      var new_units = await page.evaluate(unit_names => {
+        scraped_units = [];
+        document.querySelectorAll('#mainTable > tbody > tr').forEach(line => {
+          let unit = {};
+          unit.id = line.children[0].innerText.trim();
+          unit.name = line.children[1].children[1].innerText.trim();
+          unit.imgUrl = line.children[1].children[0].getAttribute('src').trim();
+          scraped_units.push(unit);
+        });
 
-    var new_units = await page.evaluate(unit_names => {
-      scraped_units = [];
-      document.querySelectorAll('#mainTable > tbody > tr').forEach(line => {
-        let unit = {};
-        unit.id = line.children[0].innerText.trim();
-        unit.name = line.children[1].children[1].innerText.trim();
-        unit.imgUrl = line.children[1].children[0].getAttribute('src').trim();
-        scraped_units.push(unit);
+        return scraped_units;
       });
 
-      return scraped_units;
-    });
+      units.push(...new_units);
 
-    units.push(...new_units);
+      has_next_page = await page.evaluate(() => {
+        return !document.querySelector('#mainTable_paginate .next').classList.contains('disabled');
+      });
 
-    has_next_page = await page.evaluate(() => {
-      return !document.querySelector('#mainTable_paginate .next').classList.contains('disabled');
-    });
+      if (has_next_page) {
+        await page.click('#mainTable_paginate ul li:last-child a', {waitUntil: "networkidle0"});
+        //await page.waitFor(500);
+      }
 
-    if (has_next_page) {
-      await page.click('#mainTable_paginate ul li:last-child a', {waitUntil: "networkidle0"});
-      //await page.waitFor(500);
     }
-
+  }
+  catch (err) {
+    throw err;
   }
 
   console.log(units);
