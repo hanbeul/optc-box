@@ -4,7 +4,7 @@ const https = require('https');
 
 (async () => {
   try {
-    const browser = await puppeteer.launch({headless: false});
+    const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
     await page.setViewport({width: 1200, height: 800});
     await page.goto('http://optc-db.github.io/characters/', {waitUntil: "networkidle0"});
@@ -14,6 +14,11 @@ const https = require('https');
     var index = 1;
 
     const saveImage = (url, filepath) => {
+      if (url.slice(0, 8) != 'https://') {
+        console.log('Invalid url: ', url);
+        return;
+      }
+
       console.log('Getting image from: ' + url);
       let request = https.get(url, response => {
         let file = fs.createWriteStream(filepath);
