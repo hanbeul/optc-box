@@ -1,0 +1,28 @@
+
+node_modules
+images
+test-images
+test-bg.png
+unitImages
+unitTest.json
+loopJimpTest.js
+0.png
+1.png
+2.png
+fsReadDirTest.js
+COCO-Testing
+categoriesGeneratorTestings.js
+Tests
+units.json
+
+## OS Files
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# OSX
+.DS_Store
+
+

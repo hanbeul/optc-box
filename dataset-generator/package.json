@@ -1,0 +1,15 @@
+{
+  "name": "optc-box-dataset-generator",
+  "version": "1.0.0",
+  "description": "Dataset generator for the optc box scanner. It is able to generate x amount of image datasets with 25 randomly placed optc units.",
+  "main": "main.js",
+  "dependencies": {
+    "jimp": "^0.12.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mike",
+  "license": "ISC"
+}
