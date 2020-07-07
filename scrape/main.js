@@ -1,6 +1,41 @@
 const puppeteer = require('puppeteer');
-const fs = require('fs');
+const fs = require('fs').promises;
 const https = require('https');
+const fetch = require('node-fetch');
+
+const saveImage = async (url, filepath) => {
+  if (url.slice(0, 8) != 'https://') {
+    console.log('Invalid url: ', url);
+    return;
+  }
+
+  console.log('Getting image from: ' + url);
+
+
+
+  await https.get(url, response => {
+    let file = fs.createWriteStream(filepath);
+    response.pipe(file);
+  }).on('error', e => {
+    throw e;
+  });
+}
+
+const fetchImage = async (url, filepath) => {
+  if (url.slice(0, 8) != 'https://') {
+    console.log('Invalid url: ', url);
+    return;
+  }
+
+  console.log('Getting image from: ' + url);
+
+  return fetch(url)
+  .then(response => response.buffer())
+  .then(async (buffer) => {
+    await fs.writeFile(filepath, buffer);
+  });
+}
+
 
 (async () => {
   try {
@@ -12,21 +47,6 @@ const https = require('https');
     var has_next_page = true;
     var units = [];
     var index = 1;
-
-    const saveImage = (url, filepath) => {
-      if (url.slice(0, 8) != 'https://') {
-        console.log('Invalid url: ', url);
-        return;
-      }
-
-      console.log('Getting image from: ' + url);
-      let request = https.get(url, response => {
-        let file = fs.createWriteStream(filepath);
-        response.pipe(file);
-      }).on('error', e => {
-        throw e;
-      });
-    }
 
     await page.select('select[name="mainTable_length"]', '100');
     while(has_next_page) {
@@ -65,11 +85,11 @@ const https = require('https');
     console.log(units);
 
     units.forEach(unit => {
-      let path = 'images/' + unit.id + '/';
+      let path = 'images/';
       fs.mkdir(path, { recursive: true }, (err) => {
         if (err) throw err;
       })
-      saveImage(unit.imgUrl, path + unit.id + '.png');
+      fetchImage(unit.imgUrl, path + unit.id + '.png');
     });
 
     console.log(units);
